@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Тип застройки — Портал экспонентов</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+  <meta name="theme-color" content="#0d6efd">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .section-panel { border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; margin-top: 1rem; background: #fafbff; }
+    .section-panel .panel-title { font-weight: 700; margin-bottom: 1rem; font-size: 15px; }
+    .color-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .color-swatch { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: border-color 0.15s, transform 0.1s; }
+    .color-swatch:hover { transform: scale(1.1); }
+    .color-swatch.selected { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(13,110,253,0.3); }
+    .frieze-price { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 10px 14px; font-size: 13px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <header id="header"></header>
+  <div class="header-spacer"></div>
+
+  <div class="portal-layout">
+    <div id="sidebar" class="sidebar"></div>
+    <div class="content-area">
+
+      <div class="card">
+        <div class="card-header">🏗️ Выбор типа застройки</div>
+        <div class="card-body">
+
+          <div id="deadlineWarning" class="alert alert-warning" style="display:none;">
+            ⚠️ Срок подачи информации по застройке истёк. Форма доступна только для просмотра.
+          </div>
+
+          <form id="constructionForm" onsubmit="saveConstruction(event)">
+
+            <!-- Type selection -->
+            <div class="form-group">
+              <label class="form-label">Тип застройки *</label>
+              <div class="construction-cards" style="margin-top:10px;">
+                <div class="construction-card" data-value="self" onclick="selectType('self')">
+                  <div class="icon">🔧</div>
+                  <div class="card-label">Самостоятельная</div>
+                  <div class="card-desc">Экспонент обустраивает стенд самостоятельно</div>
+                </div>
+                <div class="construction-card" data-value="standard" onclick="selectType('standard')">
+                  <div class="icon">🏗️</div>
+                  <div class="card-label">Стандартная</div>
+                  <div class="card-desc">Базовое оформление от организаторов</div>
+                </div>
+                <div class="construction-card" data-value="premium" onclick="selectType('premium')">
+                  <div class="icon">⭐</div>
+                  <div class="card-label">Улучшенная</div>
+                  <div class="card-desc">Расширенное оформление с дополнительными опциями</div>
+                </div>
+              </div>
+              <input type="hidden" id="constrType">
+            </div>
+
+            <!-- SELF PANEL -->
+            <div id="selfPanel" class="section-panel" style="display:none;">
+              <div class="panel-title">⚙️ Опции для самостоятельной застройки</div>
+              <div class="form-check"><input type="checkbox" id="selfElectricity"><label for="selfElectricity">Электричество</label></div>
+              <div class="form-check"><input type="checkbox" id="selfWater"><label for="selfWater">Водоподключение</label></div>
+              <div class="form-check"><input type="checkbox" id="selfCleaning"><label for="selfCleaning">Уборка на стенде</label></div>
+              <div class="form-check"><input type="checkbox" id="selfInternet"><label for="selfInternet">Интернет</label></div>
+            </div>
+
+            <!-- STANDARD / PREMIUM PANEL -->
+            <div id="managedPanel" class="section-panel" style="display:none;">
+              <div class="panel-title">🎨 Опции застройки</div>
+
+              <div class="form-check"><input type="checkbox" id="mgdElectricity"><label for="mgdElectricity">Электричество</label></div>
+              <div class="form-check"><input type="checkbox" id="mgdWater"><label for="mgdWater">Водоподключение</label></div>
+
+              <!-- Carpet color -->
+              <div class="form-group" style="margin-top:14px;">
+                <label class="form-label">Цвет коврового покрытия</label>
+                <div class="color-grid" id="carpetColors">
+                  <div class="color-swatch selected" data-color="Красный" style="background:#e53935;" onclick="selectColor('carpet','Красный',this)" title="Красный"></div>
+                  <div class="color-swatch" data-color="Синий" style="background:#1976d2;" onclick="selectColor('carpet','Синий',this)" title="Синий"></div>
+                  <div class="color-swatch" data-color="Зелёный" style="background:#388e3c;" onclick="selectColor('carpet','Зелёный',this)" title="Зелёный"></div>
+                  <div class="color-swatch" data-color="Серый" style="background:#757575;" onclick="selectColor('carpet','Серый',this)" title="Серый"></div>
+                  <div class="color-swatch" data-color="Чёрный" style="background:#212121;" onclick="selectColor('carpet','Чёрный',this)" title="Чёрный"></div>
+                  <div class="color-swatch" data-color="Бежевый" style="background:#d7ccc8;" onclick="selectColor('carpet','Бежевый',this)" title="Бежевый"></div>
+                  <div class="color-swatch" data-color="Белый" style="background:#f5f5f5;border:2px solid #ddd;" onclick="selectColor('carpet','Белый',this)" title="Белый"></div>
+                  <div class="color-swatch" data-color="Коричневый" style="background:#795548;" onclick="selectColor('carpet','Коричневый',this)" title="Коричневый"></div>
+                </div>
+                <input type="hidden" id="carpetColor" value="Красный">
+                <p class="form-text">Выбрано: <strong id="carpetColorLabel">Красный</strong></p>
+              </div>
+
+              <!-- Frieze panel -->
+              <div class="form-group" style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
+                <label class="form-label">Фризовая панель</label>
+                <div class="form-check"><input type="radio" name="friezeOption" id="friezeNone" value="none" onchange="onFriezeChange()" checked><label for="friezeNone">Отказаться от фризовой панели</label></div>
+                <div class="form-check"><input type="radio" name="friezeOption" id="friezeText" value="text" onchange="onFriezeChange()"><label for="friezeText">Надпись на фризе</label></div>
+                <div class="form-check"><input type="radio" name="friezeOption" id="friezeOklei" value="oklei" onchange="onFriezeChange()"><label for="friezeOklei">Оклейка фриза</label></div>
+
+                <div id="friezeTextPanel" style="display:none;margin-top:12px;">
+                  <div class="form-group">
+                    <label class="form-label">Цвет надписи</label>
+                    <div class="color-grid" id="friezeColors">
+                      <div class="color-swatch selected" data-color="Белый" style="background:#f5f5f5;border:2px solid #ddd;" onclick="selectColor('frieze','Белый',this)" title="Белый"></div>
+                      <div class="color-swatch" data-color="Чёрный" style="background:#212121;" onclick="selectColor('frieze','Чёрный',this)" title="Чёрный"></div>
+                      <div class="color-swatch" data-color="Золотой" style="background:#fbdd8b;" onclick="selectColor('frieze','Золотой',this)" title="Золотой"></div>
+                      <div class="color-swatch" data-color="Красный" style="background:#e53935;" onclick="selectColor('frieze','Красный',this)" title="Красный"></div>
+                      <div class="color-swatch" data-color="Синий" style="background:#1976d2;" onclick="selectColor('frieze','Синий',this)" title="Синий"></div>
+                    </div>
+                    <input type="hidden" id="friezeColor" value="Белый">
+                    <p class="form-text">Выбрано: <strong id="friezeColorLabel">Белый</strong></p>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Текст надписи</label>
+                    <input type="text" id="friezeText_input" class="form-control" placeholder="До 15 букв бесплатно" maxlength="100" oninput="calcFriezePrice()" style="max-width:400px">
+                    <p class="form-text">До 15 букв включено. Каждая буква сверх лимита — +100 ₽</p>
+                    <div class="frieze-price" id="friezePriceInfo" style="display:none;"></div>
+                  </div>
+                </div>
+
+                <div id="friezeOkleiPanel" style="display:none;margin-top:12px;">
+                  <div class="alert alert-info">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    Площадь оклейки рассчитывается автоматически: длина фриза × 0.3 м. Организаторы свяжутся с вами для уточнения макета.
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Длина фриза, м</label>
+                    <input type="number" id="friezeLength" class="form-control" placeholder="0" min="0.5" max="30" step="0.5" oninput="calcFriezeArea()" style="max-width:200px">
+                    <p class="form-text" id="friezeAreaInfo"></p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Art design -->
+              <div class="form-group" style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
+                <label class="form-label">Художественное оформление</label>
+                <div class="form-check"><input type="checkbox" id="artDesign" onchange="toggleArtLink()"><label for="artDesign">Заказать художественное оформление</label></div>
+                <div id="artLinkPanel" style="display:none;margin-top:8px;">
+                  <input type="url" id="artLink" class="form-control" placeholder="https://..." style="max-width:500px">
+                  <p class="form-text">Ссылка на макеты с дизайном</p>
+                </div>
+              </div>
+
+              <!-- Stand plan -->
+              <div class="form-group" style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
+                <label class="form-label">Схема застройки стенда</label>
+                <input type="file" id="standPlanFile" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.dwg" style="max-width:400px">
+                <p class="form-text">PDF, JPG, PNG, DWG</p>
+                <div id="standPlanCurrent" style="display:none;margin-top:8px;"></div>
+              </div>
+
+              <!-- Additional equipment -->
+              <div class="form-group" style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
+                <label class="form-label">Дополнительное оборудование</label>
+                <p class="form-text" style="margin-bottom:8px;">Выберите из прайс-листа (уточните у организаторов)</p>
+                <div id="equipmentList">
+                  <div class="form-check"><input type="checkbox" id="eq1" value="Стол переговорный"><label for="eq1">Стол переговорный — 1 500 ₽/день</label></div>
+                  <div class="form-check"><input type="checkbox" id="eq2" value="Стул"><label for="eq2">Стул — 300 ₽/день</label></div>
+                  <div class="form-check"><input type="checkbox" id="eq3" value="Витрина стеклянная"><label for="eq3">Витрина стеклянная — 3 000 ₽/день</label></div>
+                  <div class="form-check"><input type="checkbox" id="eq4" value="Прилавок"><label for="eq4">Прилавок — 2 000 ₽/день</label></div>
+                  <div class="form-check"><input type="checkbox" id="eq5" value="Монитор 32'"><label for="eq5">Монитор 32″ — 2 500 ₽/день</label></div>
+                  <div class="form-check"><input type="checkbox" id="eq6" value="Холодильник"><label for="eq6">Холодильник — 3 500 ₽/день</label></div>
+                </div>
+              </div>
+            </div>
+
+            <div id="constrMsg" class="alert" style="display:none;margin-top:12px;"></div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
+              <button type="submit" class="btn btn-primary" id="saveBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Сохранить
+              </button>
+              <a href="catalog.html" class="btn btn-secondary">Перейти к каталогу →</a>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <a href="dashboard.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Главная</a>
+      <a href="stand.html" class="bottom-nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Стенд</a>
+      <a href="badges.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Бейджи</a>
+      <a href="issues.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Проблемы</a>
+      <a href="settings.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>Настройки</a>
+    </div>
+  </nav>
+
+  <footer id="footer"></footer>
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+  <script>
+    let carpetColorVal = 'Красный';
+    let friezeColorVal = 'Белый';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initPage({ activePage: 'construction', title: 'Застройка' });
+      checkDeadline();
+      loadConstruction();
+    });
+
+    function checkDeadline() {
+      const deadlines = Store.get('deadlines', {});
+      if (deadlines.construction && isDeadlinePassed(deadlines.construction)) {
+        document.getElementById('deadlineWarning').style.display = 'flex';
+        document.getElementById('saveBtn').disabled = true;
+        document.getElementById('saveBtn').style.opacity = '0.5';
+      }
+    }
+
+    function selectType(val) {
+      document.getElementById('constrType').value = val;
+      document.querySelectorAll('.construction-card').forEach(c => c.classList.toggle('selected', c.dataset.value === val));
+      document.getElementById('selfPanel').style.display = val === 'self' ? 'block' : 'none';
+      document.getElementById('managedPanel').style.display = (val === 'standard' || val === 'premium') ? 'block' : 'none';
+    }
+
+    function selectColor(type, color, el) {
+      const group = type === 'carpet' ? 'carpetColors' : 'friezeColors';
+      document.querySelectorAll(`#${group} .color-swatch`).forEach(s => s.classList.remove('selected'));
+      el.classList.add('selected');
+      if (type === 'carpet') {
+        carpetColorVal = color;
+        document.getElementById('carpetColor').value = color;
+        document.getElementById('carpetColorLabel').textContent = color;
+      } else {
+        friezeColorVal = color;
+        document.getElementById('friezeColor').value = color;
+        document.getElementById('friezeColorLabel').textContent = color;
+      }
+    }
+
+    function onFriezeChange() {
+      const val = document.querySelector('input[name="friezeOption"]:checked').value;
+      document.getElementById('friezeTextPanel').style.display = val === 'text' ? 'block' : 'none';
+      document.getElementById('friezeOkleiPanel').style.display = val === 'oklei' ? 'block' : 'none';
+    }
+
+    function calcFriezePrice() {
+      const text = document.getElementById('friezeText_input').value;
+      const over = Math.max(0, text.length - 15);
+      const extra = over * 100;
+      const info = document.getElementById('friezePriceInfo');
+      if (text.length > 0) {
+        info.style.display = 'block';
+        info.innerHTML = `Символов: ${text.length}. ${over > 0 ? `Доплата за ${over} букв сверх лимита: <strong>${extra} ₽</strong>` : 'Входит в стоимость (до 15 букв)'}`;
+      } else {
+        info.style.display = 'none';
+      }
+    }
+
+    function calcFriezeArea() {
+      const len = parseFloat(document.getElementById('friezeLength').value) || 0;
+      const area = (len * 0.3).toFixed(2);
+      document.getElementById('friezeAreaInfo').textContent = len ? `Площадь оклейки: ${area} м²` : '';
+    }
+
+    function toggleArtLink() {
+      document.getElementById('artLinkPanel').style.display = document.getElementById('artDesign').checked ? 'block' : 'none';
+    }
+
+    function loadConstruction() {
+      const user = Auth.getUser();
+      const data = Store.get('construction_' + user.id, {});
+      if (!data.type) return;
+
+      selectType(data.type);
+
+      if (data.type === 'self') {
+        if (data.electricity) document.getElementById('selfElectricity').checked = true;
+        if (data.water) document.getElementById('selfWater').checked = true;
+        if (data.cleaning) document.getElementById('selfCleaning').checked = true;
+        if (data.internet) document.getElementById('selfInternet').checked = true;
+      } else {
+        if (data.electricity) document.getElementById('mgdElectricity').checked = true;
+        if (data.water) document.getElementById('mgdWater').checked = true;
+        if (data.friezeOption) {
+          const el = document.querySelector(`input[name="friezeOption"][value="${data.friezeOption}"]`);
+          if (el) { el.checked = true; onFriezeChange(); }
+        }
+        if (data.friezeText) { document.getElementById('friezeText_input').value = data.friezeText; calcFriezePrice(); }
+        if (data.friezeLength) { document.getElementById('friezeLength').value = data.friezeLength; calcFriezeArea(); }
+        if (data.artDesign) { document.getElementById('artDesign').checked = true; toggleArtLink(); }
+        if (data.artLink) document.getElementById('artLink').value = data.artLink;
+        if (data.carpetColor) {
+          const sw = document.querySelector(`#carpetColors .color-swatch[data-color="${data.carpetColor}"]`);
+          if (sw) selectColor('carpet', data.carpetColor, sw);
+        }
+        if (data.friezeColor) {
+          const sw = document.querySelector(`#friezeColors .color-swatch[data-color="${data.friezeColor}"]`);
+          if (sw) selectColor('frieze', data.friezeColor, sw);
+        }
+        if (data.equipment) {
+          data.equipment.forEach(v => {
+            document.querySelectorAll('#equipmentList input').forEach(cb => { if (cb.value === v) cb.checked = true; });
+          });
+        }
+      }
+    }
+
+    function saveConstruction(e) {
+      e.preventDefault();
+      const user = Auth.getUser();
+      const type = document.getElementById('constrType').value;
+      if (!type) { Toast.show('Выберите тип застройки', 'warning'); return; }
+
+      const data = { type, updatedAt: new Date().toISOString() };
+
+      if (type === 'self') {
+        data.electricity = document.getElementById('selfElectricity').checked;
+        data.water = document.getElementById('selfWater').checked;
+        data.cleaning = document.getElementById('selfCleaning').checked;
+        data.internet = document.getElementById('selfInternet').checked;
+      } else {
+        data.electricity = document.getElementById('mgdElectricity').checked;
+        data.water = document.getElementById('mgdWater').checked;
+        data.carpetColor = carpetColorVal;
+        data.friezeOption = document.querySelector('input[name="friezeOption"]:checked').value;
+        data.friezeText = document.getElementById('friezeText_input').value;
+        data.friezeColor = friezeColorVal;
+        data.friezeLength = document.getElementById('friezeLength').value;
+        data.artDesign = document.getElementById('artDesign').checked;
+        data.artLink = document.getElementById('artLink').value;
+        const eqs = [];
+        document.querySelectorAll('#equipmentList input:checked').forEach(cb => eqs.push(cb.value));
+        data.equipment = eqs;
+      }
+
+      Store.set('construction_' + user.id, data);
+      Auth.log('construction_save', `Застройка: ${type}`);
+      Toast.show('Данные по застройке сохранены', 'success');
+    }
+  </script>
+</body>
+</html>

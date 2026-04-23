@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>FAQ — Портал экспонентов</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+  <meta name="theme-color" content="#0d6efd">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <header id="header"></header>
+  <div class="header-spacer"></div>
+
+  <div class="portal-layout">
+    <div id="sidebar" class="sidebar"></div>
+    <div class="content-area">
+
+      <div class="card">
+        <div class="card-header">❓ Часто задаваемые вопросы</div>
+        <div class="card-body">
+          <input type="text" id="faqSearch" class="form-control" placeholder="🔍 Поиск по вопросам..." style="margin-bottom:20px;" oninput="filterFAQ()">
+
+          <div id="faqList">
+
+            <div class="faq-item">
+              <button class="faq-question" onclick="toggleFAQ(this)">
+                Где взять ключи и замки от витрин на стендовое оборудование?
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="faq-answer">
+                Ключи от витрин выдаются в офисе оргкомитета на месте (зал регистрации). При себе иметь удостоверение участника или паспорт. Офис работает: в дни монтажа с 09:00 до 20:00, в дни выставки с 08:00 до 19:00. Ключи нужно вернуть до окончания демонтажа.
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" onclick="toggleFAQ(this)">
+                Как зарегистрироваться на портале и получить доступ?
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="faq-answer">
+                Нажмите «Регистрация» на странице входа. Заполните форму и укажите код активации, который был выдан при заключении договора об участии. Если вы не получили код — обратитесь к вашему менеджеру. После регистрации аккаунт будет активирован автоматически при вводе верного кода.
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" onclick="toggleFAQ(this)">
+                До какого числа нужно заполнить информацию для каталога?
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="faq-answer">
+                Срок подачи информации для каталога — 27 февраля 2026 года. Опоздавшие данные могут не попасть в печатный каталог. При этом электронная версия каталога обновляется до дня открытия выставки.
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" onclick="toggleFAQ(this)">
+                Как добавить сотрудников для получения бейджей?
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="faq-answer">
+                Перейдите в раздел «Бейджи экспонента» и нажмите «Добавить сотрудника». Укажите ФИО и мобильный телефон каждого сотрудника. Сохраните список. Бейджи будут готовы к получению в день монтажа в офисе оргкомитета. Срок подачи списка — 6 апреля 2026 года.
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" onclick="toggleFAQ(this)">
+                Как выбрать тип застройки стенда?
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="faq-answer">
+                Перейдите в раздел «Тип застройки». Доступны три варианта:<br>
+                • <strong>Самостоятельная</strong> — вы полностью организуете стенд самостоятельно. Можно заказать только отдельные услуги (электричество, вода, интернет, уборка).<br>
+                • <strong>Стандартная</strong> — базовое оформление от организаторов, включает стены, ковровое покрытие, фризовую панель.<br>
+                • <strong>Улучшенная</strong> — расширенное оформление с дополнительными опциями и оборудованием из прайс-листа.
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" onclick="toggleFAQ(this)">
+                Что такое фризовая панель и зачем она нужна?
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="faq-answer">
+                Фризовая панель — это горизонтальная полоса в верхней части стенда с названием вашей компании. Она помогает посетителям быстро найти ваш стенд. Вы можете:<br>
+                • Отказаться от панели<br>
+                • Заказать надпись (первые 15 букв бесплатно, каждая буква сверх — 100 ₽)<br>
+                • Оклеить фриз собственным макетом (площадь = длина фриза × 0.3 м)
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" onclick="toggleFAQ(this)">
+                Как получить доверенность для ввоза оборудования?
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="faq-answer">
+                Скачайте бланк доверенности в разделе «Формы и документы». Заполните данные водителя/экспедитора, список ввозимого оборудования, заверьте подписью и печатью организации. При въезде на территорию предъявите доверенность охране вместе с паспортом ответственного лица.
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" onclick="toggleFAQ(this)">
+                Когда можно въезжать на монтаж и что для этого нужно?
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="faq-answer">
+                Монтаж: за 2 дня до открытия выставки, с 09:00 до 20:00. Для въезда необходимы:<br>
+                1. Доверенность на ввоз оборудования (заверенная печатью)<br>
+                2. Письмо на ввоз/вывоз на фирменном бланке<br>
+                3. Удостоверение участника выставки<br>
+                Скачайте все необходимые бланки в разделе «Формы и документы».
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" onclick="toggleFAQ(this)">
+                Можно ли установить приложение на телефон?
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="faq-answer">
+                Да! Портал экспонентов можно установить как приложение на любом смартфоне:<br>
+                • <strong>iPhone/iPad</strong>: откройте сайт в Safari → нажмите «Поделиться» → «На экран «Домой»»<br>
+                • <strong>Android</strong>: откройте в Chrome → нажмите «⋮» → «Добавить на главный экран» или используйте баннер «Установить приложение» вверху страницы<br>
+                После установки портал работает как приложение с иконкой на рабочем столе.
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <button class="faq-question" onclick="toggleFAQ(this)">
+                Как сообщить о технической проблеме во время выставки?
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="faq-answer">
+                Используйте раздел «Проблемы на стенде» — выберите тип проблемы и нажмите кнопку. Ответственный специалист будет уведомлён немедленно. Также вы можете обратиться на стойку информации или позвонить дежурному менеджеру (контакты в разделе «Контакты»).
+              </div>
+            </div>
+
+          </div>
+
+          <p style="margin-top:24px;font-size:13.5px;color:#666;">Не нашли ответ на свой вопрос? <a href="contacts.html">Свяжитесь с нами</a></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <a href="dashboard.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Главная</a>
+      <a href="stand.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Стенд</a>
+      <a href="badges.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Бейджи</a>
+      <a href="issues.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Проблемы</a>
+      <a href="settings.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>Настройки</a>
+    </div>
+  </nav>
+
+  <footer id="footer"></footer>
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initPage({ activePage: 'faq', title: 'FAQ' });
+    });
+
+    function toggleFAQ(btn) {
+      const answer = btn.nextElementSibling;
+      const isOpen = btn.classList.contains('open');
+      document.querySelectorAll('.faq-question.open').forEach(q => {
+        q.classList.remove('open');
+        q.nextElementSibling.classList.remove('open');
+      });
+      if (!isOpen) {
+        btn.classList.add('open');
+        answer.classList.add('open');
+      }
+    }
+
+    function filterFAQ() {
+      const q = document.getElementById('faqSearch').value.toLowerCase();
+      document.querySelectorAll('.faq-item').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(q) ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>

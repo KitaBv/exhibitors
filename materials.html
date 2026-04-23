@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Формы и документы — Портал экспонентов</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+  <meta name="theme-color" content="#0d6efd">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <header id="header"></header>
+  <div class="header-spacer"></div>
+
+  <div class="portal-layout">
+    <div id="sidebar" class="sidebar"></div>
+    <div class="content-area">
+
+      <!-- Информационные материалы -->
+      <div class="card">
+        <div class="card-header">📄 Схема заезда</div>
+        <div class="card-body">
+          <p style="font-size:14px;color:#555;margin-bottom:16px;">Информация о въезде на территорию выставки для транспорта экспонентов.</p>
+          <div class="download-item">
+            <div class="file-icon">🗺️</div>
+            <div class="file-info">
+              <div class="file-name">Схема заезда транспорта экспонентов</div>
+              <div class="file-desc">PDF, обновлено 01.03.2026</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="markDownloaded('schema_zaezda')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Скачать
+            </button>
+          </div>
+          <div class="alert alert-info" style="margin-top:12px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div>Въезд на территорию осуществляется через ворота №2 (ул. Чаянова). Транспорт с оборудованием: с 08:00 до 18:00 в день монтажа. Предъявите доверенность охране.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Форма доверенности -->
+      <div class="card">
+        <div class="card-header">📋 Форма доверенности</div>
+        <div class="card-body">
+          <p style="font-size:14px;color:#555;margin-bottom:16px;">Доверенность необходима для ввоза/вывоза оборудования и материалов.</p>
+          <div class="download-item">
+            <div class="file-icon">📜</div>
+            <div class="file-info">
+              <div class="file-name">Бланк доверенности на ввоз/вывоз</div>
+              <div class="file-desc">DOCX, Word-документ для заполнения</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="markDownloaded('doverennost')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Скачать
+            </button>
+          </div>
+          <div class="alert alert-warning" style="margin-top:12px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div>Заполненную доверенность необходимо заверить печатью компании и передать охране при въезде.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Письмо на ввоз/вывоз -->
+      <div class="card">
+        <div class="card-header">✉️ Письмо на ввоз-вывоз оборудования</div>
+        <div class="card-body">
+          <p style="font-size:14px;color:#555;margin-bottom:16px;">Официальное письмо для провоза оборудования через охрану выставки.</p>
+          <div class="download-item">
+            <div class="file-icon">📩</div>
+            <div class="file-info">
+              <div class="file-name">Шаблон письма на ввоз/вывоз</div>
+              <div class="file-desc">DOCX, заполните и распечатайте на фирменном бланке</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="markDownloaded('pismo_vvoz')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Скачать
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Бланк схемы застройки -->
+      <div class="card">
+        <div class="card-header">📐 Бланк схемы застройки</div>
+        <div class="card-body">
+          <p style="font-size:14px;color:#555;margin-bottom:16px;">Пустой бланк для самостоятельного вычерчивания схемы застройки стенда.</p>
+          <div class="download-item">
+            <div class="file-icon">📏</div>
+            <div class="file-info">
+              <div class="file-name">Бланк схемы застройки стенда</div>
+              <div class="file-desc">PDF с сеткой и инструкцией по заполнению</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="markDownloaded('blank_zastr')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Скачать
+            </button>
+          </div>
+          <div class="alert alert-info" style="margin-top:12px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div>Заполненную схему загрузите в раздел <a href="construction.html">«Тип застройки»</a> в поле «Схема застройки стенда».</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Download status -->
+      <div class="card">
+        <div class="card-header">✅ Статус скачивания документов</div>
+        <div class="card-body" id="downloadStatus">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <a href="dashboard.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Главная</a>
+      <a href="stand.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Стенд</a>
+      <a href="badges.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Бейджи</a>
+      <a href="issues.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Проблемы</a>
+      <a href="settings.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>Настройки</a>
+    </div>
+  </nav>
+
+  <footer id="footer"></footer>
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+  <script>
+    const DOC_NAMES = {
+      schema_zaezda: 'Схема заезда',
+      doverennost: 'Бланк доверенности',
+      pismo_vvoz: 'Письмо на ввоз/вывоз',
+      blank_zastr: 'Бланк схемы застройки',
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initPage({ activePage: 'materials', title: 'Документы' });
+      renderStatus();
+    });
+
+    function markDownloaded(doc) {
+      const user = Auth.getUser();
+      const key = 'dl_' + user.id;
+      const dl = Store.get(key, {});
+      dl[doc] = new Date().toISOString();
+      Store.set(key, dl);
+
+      // Mark overall as downloaded if all docs downloaded
+      if (Object.keys(dl).length >= Object.keys(DOC_NAMES).length) {
+        Store.set('materials_downloaded_' + user.id, new Date().toISOString());
+      }
+
+      Auth.log('download', `Скачан документ: ${DOC_NAMES[doc]}`);
+      renderStatus();
+      Toast.show(`Документ «${DOC_NAMES[doc]}» скачан`, 'success');
+    }
+
+    function renderStatus() {
+      const user = Auth.getUser();
+      const dl = Store.get('dl_' + user.id, {});
+      const el = document.getElementById('downloadStatus');
+      el.innerHTML = Object.entries(DOC_NAMES).map(([key, name]) => {
+        const ts = dl[key];
+        return `
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0;">
+            <span style="font-size:18px;">${ts ? '✅' : '⬜'}</span>
+            <span style="flex:1;font-size:14px;">${name}</span>
+            ${ts ? `<span style="font-size:12px;color:#999;">${formatDateTime(ts)}</span>` : '<span style="font-size:12px;color:#aaa;">Не скачан</span>'}
+          </div>
+        `;
+      }).join('');
+    }
+  </script>
+</body>
+</html>

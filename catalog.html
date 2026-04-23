@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Информация для каталога — Портал экспонентов</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+  <meta name="theme-color" content="#0d6efd">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <header id="header"></header>
+  <div class="header-spacer"></div>
+
+  <div class="portal-layout">
+    <div id="sidebar" class="sidebar"></div>
+    <div class="content-area">
+
+      <div class="card">
+        <div class="card-header">📋 Информация для каталога экспонентов</div>
+        <div class="card-body">
+
+          <div id="deadlineWarning" class="alert alert-warning" style="display:none;">
+            ⚠️ Срок подачи информации в каталог истёк. Данные сохранены, но могут не попасть в печатный каталог.
+          </div>
+
+          <p class="section-subtitle">Эти данные будут опубликованы в официальном каталоге выставки. Заполните все поля максимально точно.</p>
+
+          <form id="catalogForm" onsubmit="saveCatalog(event)">
+
+            <div class="form-group">
+              <label class="form-label">Название компании (как в каталоге) *</label>
+              <input type="text" id="catCompany" class="form-control" placeholder="Официальное название компании" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Страна</label>
+                <input type="text" id="catCountry" class="form-control" placeholder="Россия">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Город</label>
+                <input type="text" id="catCity" class="form-control" placeholder="Москва">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Описание компании *</label>
+              <textarea id="catDescription" class="form-control" rows="5" placeholder="Краткое описание компании, её деятельности и продукции (до 500 символов)..." maxlength="500" oninput="countChars()" style="resize:vertical;"></textarea>
+              <div style="display:flex;justify-content:space-between;">
+                <p class="form-text">Будет опубликовано в каталоге</p>
+                <p class="form-text" id="charCount" style="color:#999;">0 / 500</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Виды продукции / направления</label>
+              <div id="categoriesList">
+                <div class="form-check"><input type="checkbox" id="cat_coffee" value="Кофе"><label for="cat_coffee">Кофе</label></div>
+                <div class="form-check"><input type="checkbox" id="cat_tea" value="Чай"><label for="cat_tea">Чай</label></div>
+                <div class="form-check"><input type="checkbox" id="cat_cacao" value="Какао"><label for="cat_cacao">Какао / Шоколад</label></div>
+                <div class="form-check"><input type="checkbox" id="cat_equipment" value="Оборудование"><label for="cat_equipment">Оборудование</label></div>
+                <div class="form-check"><input type="checkbox" id="cat_packaging" value="Упаковка"><label for="cat_packaging">Упаковка</label></div>
+                <div class="form-check"><input type="checkbox" id="cat_accessories" value="Аксессуары"><label for="cat_accessories">Аксессуары</label></div>
+                <div class="form-check"><input type="checkbox" id="cat_other" value="Другое"><label for="cat_other">Другое</label></div>
+              </div>
+            </div>
+
+            <div class="form-group" style="border-top:1px solid var(--border);padding-top:16px;margin-top:8px;">
+              <label class="form-label" style="font-size:15px;">Контактная информация для каталога</label>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Контактное лицо</label>
+                <input type="text" id="catContact" class="form-control" placeholder="ФИО">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Должность</label>
+                <input type="text" id="catPosition" class="form-control" placeholder="Директор, менеджер...">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Телефон</label>
+                <input type="tel" id="catPhone" class="form-control" placeholder="+7 (___) ___-__-__">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="catEmail" class="form-control" placeholder="info@company.ru">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Сайт</label>
+              <input type="url" id="catWebsite" class="form-control" placeholder="https://www.company.ru" style="max-width:400px">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Логотип компании</label>
+              <input type="file" id="catLogo" class="form-control" accept=".png,.jpg,.jpeg,.svg,.pdf,.eps,.ai" style="max-width:400px">
+              <p class="form-text">PNG, JPG, SVG, PDF, EPS, AI — минимум 300 dpi для печати</p>
+              <div id="logoCurrent" style="display:none;margin-top:8px;"></div>
+            </div>
+
+            <div id="catMsg" class="alert" style="display:none;margin-top:10px;"></div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
+              <button type="submit" class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Сохранить
+              </button>
+              <a href="badges.html" class="btn btn-secondary">Перейти к бейджам →</a>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <a href="dashboard.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Главная</a>
+      <a href="stand.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Стенд</a>
+      <a href="badges.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Бейджи</a>
+      <a href="issues.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Проблемы</a>
+      <a href="settings.html" class="bottom-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>Настройки</a>
+    </div>
+  </nav>
+
+  <footer id="footer"></footer>
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initPage({ activePage: 'catalog', title: 'Каталог' });
+      checkDeadline();
+      loadCatalog();
+    });
+
+    function checkDeadline() {
+      const deadlines = Store.get('deadlines', {});
+      if (deadlines.catalog && isDeadlinePassed(deadlines.catalog)) {
+        document.getElementById('deadlineWarning').style.display = 'flex';
+      }
+    }
+
+    function countChars() {
+      const len = document.getElementById('catDescription').value.length;
+      document.getElementById('charCount').textContent = len + ' / 500';
+      document.getElementById('charCount').style.color = len > 450 ? '#dc3545' : '#999';
+    }
+
+    function loadCatalog() {
+      const user = Auth.getUser();
+      const data = Store.get('catalog_' + user.id, {});
+
+      const fields = ['catCompany','catCountry','catCity','catDescription','catContact','catPosition','catPhone','catEmail','catWebsite'];
+      fields.forEach(id => { if (data[id.replace('cat','').toLowerCase()] !== undefined) {
+        // try both formats
+        const key = id.replace('cat','').toLowerCase();
+        if (data[key]) document.getElementById(id).value = data[key];
+      }});
+
+      // simpler approach: store with same IDs
+      if (data.values) {
+        Object.entries(data.values).forEach(([id, val]) => {
+          const el = document.getElementById(id);
+          if (el) el.value = val;
+        });
+      }
+      if (data.categories) {
+        data.categories.forEach(v => {
+          document.querySelectorAll('#categoriesList input').forEach(cb => { if (cb.value === v) cb.checked = true; });
+        });
+      }
+      countChars();
+    }
+
+    function saveCatalog(e) {
+      e.preventDefault();
+      const user = Auth.getUser();
+
+      const ids = ['catCompany','catCountry','catCity','catDescription','catContact','catPosition','catPhone','catEmail','catWebsite'];
+      const values = {};
+      ids.forEach(id => { values[id] = document.getElementById(id).value.trim(); });
+
+      const cats = [];
+      document.querySelectorAll('#categoriesList input:checked').forEach(cb => cats.push(cb.value));
+
+      const data = { values, categories: cats, updatedAt: new Date().toISOString() };
+      // backward compat
+      data.description = values.catDescription;
+
+      Store.set('catalog_' + user.id, data);
+      Auth.log('catalog_save', `Информация в каталог сохранена`);
+      Toast.show('Данные для каталога сохранены', 'success');
+    }
+  </script>
+</body>
+</html>

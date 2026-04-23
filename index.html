@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Вход — Портал экспонентов Coffee Tea Cacao Expo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+  <meta name="theme-color" content="#0d6efd">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="CTC Expo">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .auth-extra { text-align: center; margin-top: 16px; font-size: 13px; color: #666; }
+    .activation-notice { background: #e8f4fd; border: 1px solid #bee5eb; border-radius: 8px; padding: 14px; margin-top: 16px; font-size: 13px; color: #0c5460; display: none; }
+    .input-group { position: relative; }
+    .input-group .toggle-pw { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #888; padding: 4px; }
+    .divider-or { display: flex; align-items: center; gap: 10px; margin: 16px 0; color: #aaa; font-size: 13px; }
+    .divider-or::before, .divider-or::after { content: ''; flex: 1; height: 1px; background: #e0e0e0; }
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-box">
+      <div class="auth-logo">
+        <img src="https://exhibitors.pro/themes/new-exhibitors-portal/assets/ex/assets/img/coffee-tea-cacao-horeca-expo-logo.jpg" alt="Coffee Tea Cacao Expo" style="max-width:200px;" onerror="this.style.display='none';document.getElementById('logoFallback').style.display='block'">
+        <div id="logoFallback" style="display:none; font-size:20px; font-weight:700; color:#212529;">☕ CTC Expo</div>
+        <p style="font-size:13px;color:#666;margin-top:8px;">Портал экспонентов</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('login')">Вход</button>
+        <button class="auth-tab" onclick="switchTab('register')">Регистрация</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="loginTab" class="auth-tab-content active">
+        <form onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" id="loginEmail" class="form-control" placeholder="your@email.com" required autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Пароль</label>
+            <div class="input-group">
+              <input type="password" id="loginPassword" class="form-control" placeholder="Введите пароль" required autocomplete="current-password" style="padding-right:40px">
+              <button type="button" class="toggle-pw" onclick="togglePw('loginPassword')">👁</button>
+            </div>
+          </div>
+          <div id="loginError" class="alert alert-danger" style="display:none;"></div>
+          <button type="submit" class="btn btn-primary btn-block btn-lg">Войти</button>
+        </form>
+        <div class="auth-extra">
+          <p style="margin-top:12px;font-size:12px;color:#999;">Тестовый доступ: <code>demo@expo.ru</code> / <code>demo123</code><br>Администратор: <code>admin@expo.ru</code> / <code>admin123</code></p>
+        </div>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="registerTab" class="auth-tab-content">
+        <form onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input type="email" id="regEmail" class="form-control" placeholder="your@email.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Название компании *</label>
+            <input type="text" id="regCompany" class="form-control" placeholder="ООО Ромашка" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Пароль *</label>
+              <div class="input-group">
+                <input type="password" id="regPassword" class="form-control" placeholder="Минимум 6 символов" required style="padding-right:40px">
+                <button type="button" class="toggle-pw" onclick="togglePw('regPassword')">👁</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Повторите пароль *</label>
+              <input type="password" id="regPassword2" class="form-control" placeholder="Повторите" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Код активации</label>
+            <input type="text" id="regCode" class="form-control" placeholder="Введите код от организаторов">
+            <p class="form-text">Код выдаётся организаторами выставки при регистрации участия</p>
+          </div>
+          <div id="registerError" class="alert alert-danger" style="display:none;"></div>
+          <button type="submit" class="btn btn-primary btn-block btn-lg">Зарегистрироваться</button>
+        </form>
+        <div id="registerSuccess" class="activation-notice">
+          <strong>✓ Заявка отправлена!</strong><br>
+          Ваш аккаунт будет активирован организаторами в течение 1 рабочего дня. Ожидайте письма на указанный email.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      seedDemoData();
+      if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+      if (Auth.isLoggedIn()) window.location.href = 'dashboard.html';
+    });
+
+    function switchTab(tab) {
+      document.querySelectorAll('.auth-tab').forEach((t, i) => t.classList.toggle('active', (i === 0) === (tab === 'login')));
+      document.getElementById('loginTab').classList.toggle('active', tab === 'login');
+      document.getElementById('registerTab').classList.toggle('active', tab === 'register');
+    }
+
+    function togglePw(id) {
+      const el = document.getElementById(id);
+      el.type = el.type === 'password' ? 'text' : 'password';
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const password = document.getElementById('loginPassword').value;
+      const errEl = document.getElementById('loginError');
+      errEl.style.display = 'none';
+
+      const users = Store.get('users', []);
+      const user = users.find(u => u.email.toLowerCase() === email && u.password === password);
+
+      if (!user) {
+        errEl.textContent = 'Неверный email или пароль';
+        errEl.style.display = 'flex';
+        return;
+      }
+      if (!user.active) {
+        errEl.textContent = 'Аккаунт ожидает активации организаторами';
+        errEl.style.display = 'flex';
+        return;
+      }
+      Auth.login(user);
+      window.location.href = 'dashboard.html';
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('registerError');
+      errEl.style.display = 'none';
+
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
+      const company = document.getElementById('regCompany').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const password2 = document.getElementById('regPassword2').value;
+      const code = document.getElementById('regCode').value.trim();
+
+      if (password.length < 6) { errEl.textContent = 'Пароль должен содержать не менее 6 символов'; errEl.style.display = 'flex'; return; }
+      if (password !== password2) { errEl.textContent = 'Пароли не совпадают'; errEl.style.display = 'flex'; return; }
+
+      const users = Store.get('users', []);
+      if (users.find(u => u.email.toLowerCase() === email)) {
+        errEl.textContent = 'Пользователь с таким email уже существует';
+        errEl.style.display = 'flex';
+        return;
+      }
+
+      const newUser = {
+        id: 'u_' + Date.now(),
+        email, company,
+        name: company,
+        password,
+        role: 'exhibitor',
+        active: code === 'EXPO2026',
+        activationCode: code || null,
+        created: new Date().toISOString(),
+        standNumber: '', exhibition: 'Coffee Tea Cacao Expo', hall: '',
+      };
+      users.push(newUser);
+      Store.set('users', users);
+
+      Auth.log('register', `Регистрация: ${email} (${company})`);
+
+      if (newUser.active) {
+        Auth.login(newUser);
+        window.location.href = 'dashboard.html';
+      } else {
+        document.querySelector('#registerTab form').style.display = 'none';
+        document.getElementById('registerSuccess').style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Администрирование — Портал экспонентов</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+  <meta name="theme-color" content="#0d6efd">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .admin-tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .admin-tab {
+      padding: 10px 18px;
+      background: none;
+      border: none;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-muted);
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      font-family: inherit;
+      border-radius: 6px 6px 0 0;
+      transition: color 0.15s, background 0.15s;
+    }
+    .admin-tab:hover { background: #f5f5f5; color: #333; }
+    .admin-tab.active { color: var(--primary); border-bottom-color: var(--primary); background: #f0f4ff; }
+    .admin-section { display: none; }
+    .admin-section.active { display: block; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .stat-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+    .stat-card .stat-num { font-size: 2rem; font-weight: 700; color: var(--primary); }
+    .stat-card .stat-label { font-size: 12.5px; color: var(--text-muted); margin-top: 4px; }
+    .user-row { display: grid; grid-template-columns: 1fr 1fr 120px 80px auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 13.5px; }
+    @media (max-width: 768px) { .user-row { grid-template-columns: 1fr auto; } .user-row .hide-mobile { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <header id="header"></header>
+  <div class="header-spacer"></div>
+
+  <div class="portal-layout">
+    <div id="sidebar" class="sidebar"></div>
+    <div class="content-area">
+
+      <div class="card">
+        <div class="card-header">⚙️ Административная панель</div>
+        <div class="card-body">
+
+          <div class="admin-tabs">
+            <button class="admin-tab active" onclick="switchAdminTab('overview')">📊 Обзор</button>
+            <button class="admin-tab" onclick="switchAdminTab('users')">👥 Пользователи</button>
+            <button class="admin-tab" onclick="switchAdminTab('exports')">📥 Выгрузки</button>
+            <button class="admin-tab" onclick="switchAdminTab('deadlines')">⏰ Дедлайны</button>
+            <button class="admin-tab" onclick="switchAdminTab('issues')">🚨 Заявки</button>
+            <button class="admin-tab" onclick="switchAdminTab('logs')">📋 Журнал</button>
+          </div>
+
+          <!-- OVERVIEW -->
+          <div id="section-overview" class="admin-section active">
+            <div class="stat-grid" id="statGrid"></div>
+            <div id="overviewDetails"></div>
+          </div>
+
+          <!-- USERS -->
+          <div id="section-users" class="admin-section">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+              <h3 style="font-size:16px;font-weight:700;margin:0;">Список экспонентов</h3>
+              <button class="btn btn-primary btn-sm" onclick="exportUsers()">📥 Экспорт CSV</button>
+            </div>
+            <div style="margin-bottom:12px;">
+              <input type="text" id="userSearch" class="form-control" placeholder="🔍 Поиск по email или компании..." oninput="filterUsers()" style="max-width:400px;">
+            </div>
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Компания / Email</th>
+                    <th class="hide-mobile">Стенд</th>
+                    <th class="hide-mobile">Зал</th>
+                    <th class="hide-mobile">Статус</th>
+                    <th>Действия</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTable"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- EXPORTS -->
+          <div id="section-exports" class="admin-section">
+            <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">Выгрузки данных</h3>
+            <div class="export-grid">
+              <div class="export-card">
+                <div class="export-title">⚡ Заказы электричества</div>
+                <div class="export-desc">Список экспонентов, заказавших подключение электричества</div>
+                <button class="btn btn-primary btn-sm" onclick="exportElectricity()">Выгрузить CSV</button>
+              </div>
+              <div class="export-card">
+                <div class="export-title">💧 Заказы водоподключения</div>
+                <div class="export-desc">Список экспонентов с водоподключением</div>
+                <button class="btn btn-primary btn-sm" onclick="exportWater()">Выгрузить CSV</button>
+              </div>
+              <div class="export-card">
+                <div class="export-title">🎨 Цвет коврового покрытия</div>
+                <div class="export-desc">Список с выбранными цветами ковра по каждому стенду</div>
+                <button class="btn btn-primary btn-sm" onclick="exportCarpet()">Выгрузить CSV</button>
+              </div>
+              <div class="export-card">
+                <div class="export-title">🔤 Фризовые панели</div>
+                <div class="export-desc">Цвет надписей и тексты для фризовых панелей</div>
+                <button class="btn btn-primary btn-sm" onclick="exportFrieze()">Выгрузить CSV</button>
+              </div>
+              <div class="export-card">
+                <div class="export-title">📋 Информация в каталог</div>
+                <div class="export-desc">Все данные о компаниях для каталога выставки</div>
+                <button class="btn btn-primary btn-sm" onclick="exportCatalog()">Выгрузить CSV</button>
+              </div>
+              <div class="export-card">
+                <div class="export-title">🪪 Бейджи экспонентов</div>
+                <div class="export-desc">Полный список сотрудников всех экспонентов с телефонами</div>
+                <button class="btn btn-primary btn-sm" onclick="exportBadges()">Выгрузить CSV</button>
+              </div>
+              <div class="export-card">
+                <div class="export-title">🚨 Заявки на стенде</div>
+                <div class="export-desc">История всех заявок о проблемах на стендах</div>
+                <button class="btn btn-primary btn-sm" onclick="exportIssues()">Выгрузить CSV</button>
+              </div>
+              <div class="export-card">
+                <div class="export-title">📦 Полный экспорт</div>
+                <div class="export-desc">Все данные всех экспонентов одним файлом</div>
+                <button class="btn btn-success btn-sm" onclick="exportAll()">Выгрузить всё</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- DEADLINES -->
+          <div id="section-deadlines" class="admin-section">
+            <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">Настройка сроков заполнения</h3>
+            <div class="alert alert-warning">
+              ⚠️ После истечения дедлайна экспоненты не смогут редактировать соответствующие разделы.
+            </div>
+            <form onsubmit="saveDeadlines(event)" style="max-width:500px;">
+              <div class="form-group">
+                <label class="form-label">Информация для каталога — срок до</label>
+                <input type="date" id="dlCatalog" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Выбор типа застройки — срок до</label>
+                <input type="date" id="dlConstruction" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Бейджи экспонентов — срок до</label>
+                <input type="date" id="dlBadges" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Новинки — срок до</label>
+                <input type="date" id="dlItems" class="form-control">
+              </div>
+              <button type="submit" class="btn btn-primary">Сохранить дедлайны</button>
+            </form>
+          </div>
+
+          <!-- ISSUES -->
+          <div id="section-issues" class="admin-section">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+              <h3 style="font-size:16px;font-weight:700;margin:0;">Заявки о проблемах на стендах</h3>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <select id="issueFilter" class="form-select" onchange="renderIssues()" style="width:auto;">
+                  <option value="">Все статусы</option>
+                  <option value="open">Открытые</option>
+                  <option value="inprogress">В работе</option>
+                  <option value="resolved">Решённые</option>
+                </select>
+                <button class="btn btn-outline btn-sm" onclick="renderIssues()">Обновить</button>
+              </div>
+            </div>
+            <div id="adminIssues"></div>
+          </div>
+
+          <!-- LOGS -->
+          <div id="section-logs" class="admin-section">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+              <h3 style="font-size:16px;font-weight:700;margin:0;">Журнал действий</h3>
+              <button class="btn btn-outline btn-sm" onclick="exportLogs()">📥 Экспорт</button>
+            </div>
+            <div id="logsTable"></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer id="footer"></footer>
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initPage({ activePage: 'admin', title: 'Администрирование', requireAdmin: true });
+      renderOverview();
+      loadDeadlineForms();
+    });
+
+    function switchAdminTab(tab) {
+      document.querySelectorAll('.admin-tab').forEach((t, i) => {
+        const tabs = ['overview','users','exports','deadlines','issues','logs'];
+        t.classList.toggle('active', tabs[i] === tab);
+      });
+      document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+      const el = document.getElementById('section-' + tab);
+      if (el) { el.classList.add('active'); }
+
+      if (tab === 'users') renderUsers();
+      if (tab === 'issues') renderIssues();
+      if (tab === 'logs') renderLogs();
+    }
+
+    function getAllUsers() {
+      return Store.get('users', []).filter(u => u.role !== 'admin');
+    }
+
+    function renderOverview() {
+      const users = getAllUsers();
+      const issues = Store.get('issues', []);
+      const openIssues = issues.filter(i => i.status === 'open').length;
+
+      // count stats
+      let catalogDone = 0, badgesDone = 0, constructionDone = 0;
+      users.forEach(u => {
+        const cat = Store.get('catalog_' + u.id, {});
+        if (cat.description) catalogDone++;
+        const badges = Store.get('badges_' + u.id, []);
+        if (badges.length > 0) badgesDone++;
+        const constr = Store.get('construction_' + u.id, {});
+        if (constr.type) constructionDone++;
+      });
+
+      document.getElementById('statGrid').innerHTML = `
+        <div class="stat-card"><div class="stat-num">${users.length}</div><div class="stat-label">Экспонентов</div></div>
+        <div class="stat-card"><div class="stat-num">${catalogDone}</div><div class="stat-label">Каталог заполнен</div></div>
+        <div class="stat-card"><div class="stat-num">${constructionDone}</div><div class="stat-label">Застройка выбрана</div></div>
+        <div class="stat-card"><div class="stat-num">${badgesDone}</div><div class="stat-label">Бейджи поданы</div></div>
+        <div class="stat-card" style="${openIssues > 0 ? 'border-color:#dc3545;background:#fff5f5;' : ''}">
+          <div class="stat-num" style="${openIssues > 0 ? 'color:#dc3545;' : ''}">${openIssues}</div>
+          <div class="stat-label">Открытых заявок</div>
+        </div>
+      `;
+
+      // Progress by user
+      const rows = users.map(u => {
+        const cat = Store.get('catalog_' + u.id, {});
+        const badges = Store.get('badges_' + u.id, []);
+        const constr = Store.get('construction_' + u.id, {});
+        const stand = Store.get('stand_' + u.id, {});
+        const done = [!!cat.description, badges.length > 0, !!constr.type, !!(stand.type)].filter(Boolean).length;
+        const pct = Math.round(done / 4 * 100);
+        return `<tr>
+          <td>${escHtml(u.company || u.name)}</td>
+          <td>${escHtml(u.standNumber || '—')}</td>
+          <td><div class="progress" style="min-width:80px;"><div class="progress-bar ${pct===100?'success':''}" style="width:${pct}%"></div></div></td>
+          <td style="font-size:12px;font-weight:600;${pct===100?'color:#198754;':'color:#856404;'}">${pct}%</td>
+        </tr>`;
+      }).join('');
+
+      document.getElementById('overviewDetails').innerHTML = users.length ? `
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead><tr><th>Компания</th><th>Стенд</th><th>Прогресс</th><th>%</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      ` : '<p style="color:#999;">Нет зарегистрированных экспонентов</p>';
+    }
+
+    function renderUsers() {
+      const q = (document.getElementById('userSearch')?.value || '').toLowerCase();
+      const users = Store.get('users', []).filter(u => {
+        const match = (u.email + u.company + u.name + u.standNumber).toLowerCase().includes(q);
+        return match;
+      });
+
+      document.getElementById('usersTable').innerHTML = users.map(u => `
+        <tr>
+          <td>
+            <div style="font-weight:600;">${escHtml(u.company || u.name)}</div>
+            <div style="font-size:12px;color:#999;">${escHtml(u.email)}</div>
+          </td>
+          <td class="hide-mobile">${escHtml(u.standNumber || '—')}</td>
+          <td class="hide-mobile">${escHtml(u.hall || '—')}</td>
+          <td class="hide-mobile">
+            ${u.active ? '<span class="badge badge-success">Активен</span>' : '<span class="badge badge-warning">Ожидает</span>'}
+            ${u.role === 'admin' ? '<span class="badge badge-primary" style="margin-left:4px;">Админ</span>' : ''}
+          </td>
+          <td>
+            ${!u.active ? `<button class="btn btn-success btn-sm" onclick="activateUser('${u.id}')">Активировать</button>` : ''}
+            ${u.role !== 'admin' ? `<button class="btn btn-danger btn-sm" style="margin-left:4px;" onclick="deleteUser('${u.id}')">✕</button>` : ''}
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="5" style="text-align:center;color:#999;padding:24px;">Нет пользователей</td></tr>';
+    }
+
+    function filterUsers() { renderUsers(); }
+
+    function activateUser(id) {
+      const users = Store.get('users', []);
+      const u = users.find(u => u.id === id);
+      if (u) { u.active = true; Store.set('users', users); renderUsers(); Toast.show('Пользователь активирован', 'success'); }
+    }
+
+    function deleteUser(id) {
+      if (!confirm('Удалить пользователя? Все его данные будут сохранены.')) return;
+      let users = Store.get('users', []);
+      users = users.filter(u => u.id !== id);
+      Store.set('users', users);
+      renderUsers();
+      Toast.show('Пользователь удалён', 'success');
+    }
+
+    function exportUsers() {
+      const data = getAllUsers().map(u => ({
+        'Email': u.email, 'Компания': u.company || u.name,
+        'Стенд': u.standNumber || '', 'Зал': u.hall || '',
+        'Статус': u.active ? 'Активен' : 'Ожидает',
+        'Дата регистрации': formatDate(u.created),
+      }));
+      downloadCSV(data, 'exponenty.csv');
+    }
+
+    // --- Exports ---
+    function getConstructionData(type) {
+      return getAllUsers().filter(u => {
+        const c = Store.get('construction_' + u.id, {});
+        return c.type === type || (type === 'any' && c.type);
+      }).map(u => {
+        const c = Store.get('construction_' + u.id, {});
+        const s = Store.get('stand_' + u.id, {});
+        return { ...u, ...c, ...s };
+      });
+    }
+
+    function exportElectricity() {
+      const data = getAllUsers().filter(u => {
+        const c = Store.get('construction_' + u.id, {});
+        return c.electricity;
+      }).map(u => {
+        const c = Store.get('construction_' + u.id, {});
+        const s = Store.get('stand_' + u.id, {});
+        return { 'Компания': u.company, 'Email': u.email, 'Стенд': u.standNumber || s.standNumber || '', 'Тип застройки': c.type };
+      });
+      downloadCSV(data, 'electricity.csv');
+    }
+
+    function exportWater() {
+      const data = getAllUsers().filter(u => {
+        const c = Store.get('construction_' + u.id, {});
+        return c.water;
+      }).map(u => {
+        const c = Store.get('construction_' + u.id, {});
+        const s = Store.get('stand_' + u.id, {});
+        return { 'Компания': u.company, 'Email': u.email, 'Стенд': u.standNumber || s.standNumber || '' };
+      });
+      downloadCSV(data, 'water.csv');
+    }
+
+    function exportCarpet() {
+      const data = getAllUsers().map(u => {
+        const c = Store.get('construction_' + u.id, {});
+        const s = Store.get('stand_' + u.id, {});
+        return { 'Компания': u.company, 'Стенд': u.standNumber || s.standNumber || '', 'Цвет ковра': c.carpetColor || '—', 'Тип застройки': c.type || '—' };
+      }).filter(r => r['Цвет ковра'] !== '—');
+      downloadCSV(data, 'carpet.csv');
+    }
+
+    function exportFrieze() {
+      const data = getAllUsers().filter(u => {
+        const c = Store.get('construction_' + u.id, {});
+        return c.friezeOption && c.friezeOption !== 'none';
+      }).map(u => {
+        const c = Store.get('construction_' + u.id, {});
+        const s = Store.get('stand_' + u.id, {});
+        const over = Math.max(0, (c.friezeText || '').length - 15);
+        return {
+          'Компания': u.company, 'Стенд': u.standNumber || s.standNumber || '',
+          'Опция фриза': c.friezeOption === 'text' ? 'Надпись' : 'Оклейка',
+          'Цвет надписи': c.friezeColor || '', 'Текст': c.friezeText || '',
+          'Символов': (c.friezeText || '').length,
+          'Доплата (руб)': over * 100,
+          'Длина фриза (м)': c.friezeLength || '',
+          'Площадь оклейки (м²)': c.friezeLength ? (c.friezeLength * 0.3).toFixed(2) : '',
+        };
+      });
+      downloadCSV(data, 'frieze.csv');
+    }
+
+    function exportCatalog() {
+      const data = getAllUsers().map(u => {
+        const c = Store.get('catalog_' + u.id, {});
+        const v = c.values || {};
+        const s = Store.get('stand_' + u.id, {});
+        return {
+          'Стенд': u.standNumber || s.standNumber || '',
+          'Название в каталоге': v.catCompany || '',
+          'Страна': v.catCountry || '',
+          'Город': v.catCity || '',
+          'Описание': v.catDescription || '',
+          'Направления': (c.categories || []).join(', '),
+          'Контакт': v.catContact || '',
+          'Телефон': v.catPhone || '',
+          'Email': v.catEmail || '',
+          'Сайт': v.catWebsite || '',
+        };
+      });
+      downloadCSV(data, 'catalog.csv');
+    }
+
+    function exportBadges() {
+      const rows = [];
+      getAllUsers().forEach(u => {
+        const badges = Store.get('badges_' + u.id, []);
+        const s = Store.get('stand_' + u.id, {});
+        badges.forEach(b => {
+          rows.push({ 'Компания': u.company, 'Стенд': u.standNumber || s.standNumber || '', 'ФИО': b.name, 'Телефон': b.phone });
+        });
+      });
+      downloadCSV(rows, 'badges.csv');
+    }
+
+    function exportIssues() {
+      const data = Store.get('issues', []).map(i => ({
+        'Дата': formatDateTime(i.createdAt), 'Компания': i.company || '',
+        'Стенд': i.stand || '', 'Тип': i.label,
+        'Комментарий': i.comment || '', 'Статус': i.status,
+      }));
+      downloadCSV(data, 'issues.csv');
+    }
+
+    function exportAll() {
+      exportElectricity();
+      setTimeout(() => exportWater(), 200);
+      setTimeout(() => exportCarpet(), 400);
+      setTimeout(() => exportFrieze(), 600);
+      setTimeout(() => exportCatalog(), 800);
+      setTimeout(() => exportBadges(), 1000);
+      Toast.show('Все выгрузки запущены', 'success');
+    }
+
+    // --- Deadlines ---
+    function loadDeadlineForms() {
+      const d = Store.get('deadlines', {});
+      if (d.catalog) document.getElementById('dlCatalog').value = d.catalog;
+      if (d.construction) document.getElementById('dlConstruction').value = d.construction;
+      if (d.badges) document.getElementById('dlBadges').value = d.badges;
+      if (d.items) document.getElementById('dlItems').value = d.items;
+    }
+
+    function saveDeadlines(e) {
+      e.preventDefault();
+      const d = {
+        catalog: document.getElementById('dlCatalog').value,
+        construction: document.getElementById('dlConstruction').value,
+        badges: document.getElementById('dlBadges').value,
+        items: document.getElementById('dlItems').value,
+      };
+      Store.set('deadlines', d);
+      Auth.log('deadlines_update', 'Дедлайны обновлены');
+      Toast.show('Дедлайны сохранены', 'success');
+    }
+
+    // --- Issues ---
+    function renderIssues() {
+      const filter = document.getElementById('issueFilter')?.value || '';
+      let issues = Store.get('issues', []);
+      if (filter) issues = issues.filter(i => i.status === filter);
+
+      const statusMap = { open: ['Открыта', '#dc3545'], inprogress: ['В работе', '#856404'], resolved: ['Решена', '#198754'] };
+
+      document.getElementById('adminIssues').innerHTML = issues.length ? `
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead><tr><th>Дата</th><th>Компания / Стенд</th><th>Проблема</th><th>Статус</th><th>Действие</th></tr></thead>
+            <tbody>
+              ${issues.map(i => {
+                const [sl, sc] = statusMap[i.status] || ['?','#999'];
+                return `<tr>
+                  <td style="font-size:12px;color:#666;">${formatDateTime(i.createdAt)}</td>
+                  <td><div>${escHtml(i.company || i.userEmail)}</div><div style="font-size:12px;color:#999;">Стенд: ${escHtml(i.stand || '—')}</div></td>
+                  <td>
+                    <div style="font-weight:600;">${escHtml(i.label)}</div>
+                    ${i.comment ? `<div style="font-size:12px;color:#555;">${escHtml(i.comment)}</div>` : ''}
+                  </td>
+                  <td><span style="color:${sc};font-weight:600;font-size:13px;">${sl}</span></td>
+                  <td>
+                    <select onchange="updateIssueStatus('${i.id}',this.value)" class="form-select" style="width:auto;padding:4px 28px 4px 8px;font-size:12px;">
+                      <option value="open" ${i.status==='open'?'selected':''}>Открыта</option>
+                      <option value="inprogress" ${i.status==='inprogress'?'selected':''}>В работе</option>
+                      <option value="resolved" ${i.status==='resolved'?'selected':''}>Решена</option>
+                    </select>
+                  </td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      ` : '<p style="color:#999;text-align:center;padding:24px;">Нет заявок</p>';
+    }
+
+    function updateIssueStatus(id, status) {
+      const issues = Store.get('issues', []);
+      const i = issues.find(x => x.id === id);
+      if (i) { i.status = status; i.updatedAt = new Date().toISOString(); }
+      Store.set('issues', issues);
+      Toast.show('Статус обновлён', 'success');
+    }
+
+    // --- Logs ---
+    function renderLogs() {
+      const logs = Store.get('logs', []);
+      document.getElementById('logsTable').innerHTML = logs.length ? `
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead><tr><th>Время</th><th>Пользователь</th><th>Действие</th><th>Детали</th></tr></thead>
+            <tbody>
+              ${logs.slice(0,200).map(l => `<tr>
+                <td style="font-size:12px;white-space:nowrap;">${formatDateTime(l.ts)}</td>
+                <td style="font-size:12px;">${escHtml(l.user)}</td>
+                <td><span class="badge badge-secondary">${escHtml(l.action)}</span></td>
+                <td style="font-size:13px;">${escHtml(l.detail)}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      ` : '<p style="color:#999;text-align:center;padding:24px;">Журнал пуст</p>';
+    }
+
+    function exportLogs() {
+      const data = Store.get('logs', []).map(l => ({
+        'Время': formatDateTime(l.ts), 'Пользователь': l.user,
+        'Действие': l.action, 'Детали': l.detail,
+      }));
+      downloadCSV(data, 'logs.csv');
+    }
+  </script>
+</body>
+</html>

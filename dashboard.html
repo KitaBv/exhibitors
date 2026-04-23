@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Главная — Портал экспонентов</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+  <meta name="theme-color" content="#0d6efd">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="CTC Expo">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Install Banner -->
+  <div id="installBanner" class="install-banner" style="display:none;" onclick="installPWA()">
+    <div class="install-icon">📱</div>
+    <div class="install-text"><strong>Установить приложение</strong><br><span style="font-size:12px;opacity:0.9">Добавить на главный экран для быстрого доступа</span></div>
+    <button class="install-close" onclick="event.stopPropagation();dismissInstallBanner()">✕</button>
+  </div>
+
+  <!-- Mobile overlay -->
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <header id="header"></header>
+  <div class="header-spacer"></div>
+
+  <div class="portal-layout">
+    <div id="sidebar" class="sidebar"></div>
+
+    <div class="content-area">
+
+      <!-- Welcome card -->
+      <div class="card">
+        <div class="card-body" id="welcomeCard">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Progress card -->
+      <div class="card">
+        <div class="card-header">
+          📋 Чек-лист подготовки к выставке
+        </div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <span style="font-size:13px;color:#666;">Прогресс заполнения</span>
+            <span id="progressPct" style="font-weight:700;color:#0d6efd;">0%</span>
+          </div>
+          <div class="progress" style="margin-bottom:20px;">
+            <div class="progress-bar" id="progressBar" style="width:0%"></div>
+          </div>
+          <ul class="task-list" id="taskList">
+            <!-- Rendered by JS -->
+          </ul>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="card">
+        <div class="card-header">⚡ Быстрые действия</div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">
+            <a href="badges.html" class="btn btn-outline" style="flex-direction:column;padding:16px;text-align:center;gap:6px;">
+              <span style="font-size:1.5rem">🪪</span>
+              <span>Добавить бейдж</span>
+            </a>
+            <a href="issues.html" class="btn btn-outline" style="flex-direction:column;padding:16px;text-align:center;gap:6px;border-color:#dc3545;color:#dc3545;">
+              <span style="font-size:1.5rem">🚨</span>
+              <span>Сообщить о проблеме</span>
+            </a>
+            <a href="materials.html" class="btn btn-outline" style="flex-direction:column;padding:16px;text-align:center;gap:6px;">
+              <span style="font-size:1.5rem">📄</span>
+              <span>Скачать документы</span>
+            </a>
+            <a href="construction.html" class="btn btn-outline" style="flex-direction:column;padding:16px;text-align:center;gap:6px;">
+              <span style="font-size:1.5rem">🏗️</span>
+              <span>Выбрать застройку</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deadlines summary -->
+      <div class="card" id="deadlinesCard">
+        <div class="card-header">⏰ Важные сроки</div>
+        <div class="card-body" id="deadlinesList"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bottom nav (mobile) -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-inner">
+      <a href="dashboard.html" class="bottom-nav-item active">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        Главная
+      </a>
+      <a href="stand.html" class="bottom-nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        Стенд
+      </a>
+      <a href="badges.html" class="bottom-nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Бейджи
+      </a>
+      <a href="issues.html" class="bottom-nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Проблемы
+      </a>
+      <a href="settings.html" class="bottom-nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Настройки
+      </a>
+    </div>
+  </nav>
+
+  <footer id="footer"></footer>
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initPage({ activePage: 'dashboard', title: 'Главная' });
+      renderDashboard();
+    });
+
+    function renderDashboard() {
+      const user = Auth.getUser();
+      const deadlines = Store.get('deadlines', {});
+
+      // Welcome
+      const welcomeEl = document.getElementById('welcomeCard');
+      welcomeEl.innerHTML = `
+        <h2 style="font-size:18px;font-weight:700;margin-bottom:8px;">Добро пожаловать, ${escHtml(user.company || user.name)}!</h2>
+        <p style="color:#555;font-size:14px;margin-bottom:0;">Для участия в выставке необходимо заполнить все разделы ниже в указанные сроки. Следите за прогрессом и дедлайнами.</p>
+      `;
+
+      // Check what's filled
+      const standData = Store.get('stand_' + user.id, {});
+      const constructionData = Store.get('construction_' + user.id, {});
+      const catalogData = Store.get('catalog_' + user.id, {});
+      const badgesData = Store.get('badges_' + user.id, []);
+
+      const tasks = [
+        {
+          label: 'Информация о стенде',
+          href: 'stand.html',
+          done: !!(standData.type && standData.width && standData.length),
+          deadline: null,
+        },
+        {
+          label: 'Выбор типа застройки',
+          href: 'construction.html',
+          done: !!(constructionData.type),
+          deadline: deadlines.construction,
+        },
+        {
+          label: 'Информация для каталога экспонентов',
+          href: 'catalog.html',
+          done: !!(catalogData.description && catalogData.description.length > 10),
+          deadline: deadlines.catalog,
+        },
+        {
+          label: 'Бейджи для сотрудников',
+          href: 'badges.html',
+          done: badgesData.length > 0,
+          deadline: deadlines.badges,
+        },
+        {
+          label: 'Скачать необходимые документы',
+          href: 'materials.html',
+          done: !!(Store.get('materials_downloaded_' + user.id)),
+          deadline: null,
+        },
+      ];
+
+      const doneCount = tasks.filter(t => t.done).length;
+      const pct = Math.round((doneCount / tasks.length) * 100);
+
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressBar').className = 'progress-bar' + (pct === 100 ? ' success' : '');
+      document.getElementById('progressPct').textContent = pct + '%';
+
+      const taskListEl = document.getElementById('taskList');
+      taskListEl.innerHTML = tasks.map(t => {
+        const passed = t.deadline && isDeadlinePassed(t.deadline);
+        const close = t.deadline && isDeadlineClose(t.deadline);
+        const checkClass = t.done ? 'done' : (passed ? 'overdue' : 'pending');
+        const checkIcon = t.done ? '✓' : (passed ? '!' : '○');
+        const deadlineText = t.deadline ? `до ${t.deadline.split('-').reverse().join('.')}` : '';
+        const deadlineClass = passed ? 'overdue' : '';
+        return `
+          <li class="task-item">
+            <div class="task-check ${checkClass}">${checkIcon}</div>
+            <div class="task-text">
+              <a href="${t.href}" style="font-weight:500;color:inherit;text-decoration:none;">${escHtml(t.label)}</a>
+              ${t.done ? '<span class="badge badge-success" style="margin-left:8px;">Заполнено</span>' : ''}
+            </div>
+            ${deadlineText ? `<div class="task-deadline ${deadlineClass}">${deadlineText}</div>` : ''}
+          </li>
+        `;
+      }).join('');
+
+      // Deadlines
+      const allDeadlines = [
+        { label: 'Информация для каталога', date: deadlines.catalog },
+        { label: 'Тип застройки', date: deadlines.construction },
+        { label: 'Бейджи экспонента', date: deadlines.badges },
+      ].filter(d => d.date);
+
+      const dlEl = document.getElementById('deadlinesList');
+      dlEl.innerHTML = `<div class="table-wrapper"><table class="data-table">
+        <thead><tr><th>Задача</th><th>Срок</th><th>Статус</th></tr></thead>
+        <tbody>
+          ${allDeadlines.map(d => {
+            const passed = isDeadlinePassed(d.date);
+            const close = isDeadlineClose(d.date);
+            const status = passed ? '<span class="badge badge-danger">Истёк</span>' : close ? '<span class="badge badge-warning">Скоро</span>' : '<span class="badge badge-success">Актуален</span>';
+            return `<tr><td>${escHtml(d.label)}</td><td>${d.date.split('-').reverse().join('.')}</td><td>${status}</td></tr>`;
+          }).join('')}
+        </tbody>
+      </table></div>`;
+    }
+  </script>
+</body>
+</html>
